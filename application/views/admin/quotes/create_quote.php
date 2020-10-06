@@ -1,0 +1,271 @@
+<?php
+// Create Invoice Page
+$system_setting = $this->Xin_model->read_setting_info(1);
+?>
+<?php $session = $this->session->userdata('username');?>
+<?php $get_animate = $this->Xin_model->get_content_animate();?>
+<?php $user_info = $this->Xin_model->read_user_info($session['user_id']);?>
+<div class="row <?php echo $get_animate;?>">
+  <div class="col-md-12">
+    <div class="box">
+      <div class="box-header with-border">
+        <h3 class="box-title"> <?php echo $this->lang->line('xin_create_quote');?> </h3>
+        <div class="box-tools pull-right">
+      <button type="button" class="btn btn-xs btn-primary" onclick="window.location='<?php echo site_url('admin/quotes/')?>'"> <span class="ion ion-md-add"></span> <?php echo $this->lang->line('xin_view_all_quotes');?></button>
+    </div>
+      </div>
+      <div class="box-body" aria-expanded="true" style="">
+        <div class="row m-b-1">
+          <div class="col-md-12">
+            <?php $attributes = array('name' => 'create_quote', 'id' => 'xin-form', 'autocomplete' => 'off', 'class' => 'form');?>
+            <?php $hidden = array('user_id' => 0);?>
+            <?php echo form_open('admin/quotes/create_new_quote', $attributes, $hidden);?>
+            <?php $inv_info = last_client_invoice_info(); $linv = $inv_info + 1;?>
+            <div class="bg-white">
+              <div class="box-block">
+                <div class="row">
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="quote_number"><?php echo $this->lang->line('xin_title_quote_number');?></label>
+                      <input class="form-control" placeholder="<?php echo $this->lang->line('xin_title_quote_number');?>" name="quote_number" type="text" value="Q-<?php echo '000'.$linv;?>">
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="xin_title"><?php echo $this->lang->line('xin_project_title');?></label>
+                      <input class="form-control" placeholder="<?php echo $this->lang->line('xin_project_title');?>" name="xin_title" type="text">
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="quote_date"><?php echo $this->lang->line('xin_quote_date');?></label>
+                      <input class="form-control date" placeholder="<?php echo $this->lang->line('xin_quote_date');?>" readonly="readonly" name="quote_date" type="text" value="">
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="quote_due_date"><?php echo $this->lang->line('xin_project_start_date');?></label>
+                      <input class="form-control date" placeholder="<?php echo $this->lang->line('xin_project_start_date');?>" readonly="readonly" name="quote_due_date" type="text" value="">
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="client_id"><?php echo $this->lang->line('module_company_title');?></label>
+                      <select name="client_id" id="client_id" class="form-control" data-plugin="select_hrm" data-placeholder="<?php echo $this->lang->line('module_company_title');?>">
+                        <option value=""></option>
+                        <?php foreach($all_clients as $client) {?>
+                        <option value="<?php echo $client->client_id;?>"> <?php echo $client->company_name;?></option>
+                        <?php } ?>
+                      </select>
+                    </div>
+                  </div>
+                  <?php if($user_info[0]->user_role_id==1){ ?>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="company_id"><?php echo $this->lang->line('left_organization');?></label>
+                      <select name="company_id" id="aj_company" class="form-control" data-plugin="select_hrm" data-placeholder="<?php echo $this->lang->line('left_organization');?>">
+                        <option value=""></option>
+                        <?php foreach($all_companies as $company) {?>
+                        <option value="<?php echo $company->company_id;?>"> <?php echo $company->name;?></option>
+                        <?php } ?>
+                      </select>
+                    </div>
+                  </div>
+                  <?php } else {?>
+                  <?php $ecompany_id = $user_info[0]->company_id;?>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="company_id"><?php echo $this->lang->line('left_organization');?></label>
+                      <select name="company_id" id="aj_company" class="form-control" data-plugin="select_hrm" data-placeholder="<?php echo $this->lang->line('left_organization');?>">
+                        <option value=""></option>
+                        <?php foreach($all_companies as $company) {?>
+                        <?php if($ecompany_id == $company->company_id):?>
+                        <option value="<?php echo $company->company_id;?>"> <?php echo $company->name;?></option>
+                        <?php endif;?>
+                        <?php } ?>
+                      </select>
+                    </div>
+                  </div>
+                  <?php } ?>
+                  <div class="col-md-3">
+                    <div class="form-group" id="employee_ajax">
+                      <label for="project_manager"><?php echo $this->lang->line('xin_project_manager_title');?></label>
+                      <select name="project_manager" id="project_manager" class="form-control select-border-color border-warning" data-plugin="select_hrm" data-placeholder="<?php echo $this->lang->line('xin_project_manager_title');?>">
+                        <option value=""></option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group" id="cemployee_ajax">
+                      <label for="employee"><?php echo $this->lang->line('xin_project_coordinator');?></label>
+                      <select name="project_coordinator" id="project_coordinator" class="form-control select-border-color border-warning" data-plugin="select_hrm" data-placeholder="<?php echo $this->lang->line('xin_project_coordinator');?>">
+                        <option value=""></option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                <div class="col-md-3">
+                    <div class="form-group" id="cemployee_ajax">
+                      <label for="quote_type"><?php echo $this->lang->line('xin_quote_type');?></label>
+                      <select name="quote_type" id="quote_type" class="form-control select-border-color border-warning" data-plugin="select_hrm" data-placeholder="<?php echo $this->lang->line('xin_quote_type');?>">
+                        <option value="bid"><?php echo $this->lang->line('xin_quote_type_bid');?></option>
+                        <option value="tm"><?php echo $this->lang->line('xin_quote_type_tm');?></option>
+                      </select>
+                    </div>
+                  </div>
+                </div>  
+                <hr>
+                <div class="row">
+                  <div class="col-md-12">
+                    <div class="form-group">
+                      <div class="hrsale-item-values">
+                        <div data-repeater-list="items">
+                          <div data-repeater-item="">
+                            <div class="row item-row">
+                              <div class="form-group mb-1 col-sm-12 col-md-6">
+                                <label for="item_name">Item</label>
+                                <br>
+                                <input type="text" class="form-control item_name" name="item_name[]" id="item_name" placeholder="Item Name">
+                              </div>
+                              <div class="form-group mb-1 col-sm-12 col-md-1">
+                                <label for="qty_hrs" class="cursor-pointer">Qty/Hrs</label>
+                                <br>
+                                <input type="text" class="form-control qty_hrs" name="qty_hrs[]" id="qty_hrs" value="1">
+                              </div>
+                              <div class="skin skin-flat form-group mb-1 col-sm-12 col-md-2">
+                                <label for="unit_price">Unit Price</label>
+                                <br>
+                                <input class="form-control unit_price" type="text" name="unit_price[]" value="0" id="unit_price" />
+                              </div>
+                              <div class="form-group mb-1 col-sm-12 col-md-2">
+                                <label for="profession">Subtotal</label>
+                                <input type="text" class="form-control sub-total-item" readonly="readonly" name="sub_total_item[]" value="0" />
+                                <!-- <br>-->
+                                <p style="display:none" class="form-control-static"><span class="amount-html">0</span></p>
+                              </div>
+                              <div class="form-group col-sm-12 col-md-1 text-xs-center mt-2">
+                                <label for="profession">&nbsp;</label>
+                                <br>
+                                <button type="button" class="btn icon-btn btn-xs btn-danger waves-effect waves-light remove-invoice-item" data-repeater-delete=""> <span class="fa fa-trash"></span></button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div id="item-list"></div>
+                      <div class="form-group overflow-hidden1">
+                        <div class="col-xs-12">
+                          <button type="button" data-repeater-create="" class="btn btn-primary" id="add-invoice-item"> <i class="fa fa-plus"></i> Add Item</button>
+                        </div>
+                      </div>
+                      <?php
+						$ar_sc = explode('- ',$system_setting[0]->default_currency_symbol);
+						$sc_show = $ar_sc[1];
+						?>
+                      <input type="hidden" class="items-sub-total" name="items_sub_total" value="0" />
+                      <input type="hidden" class="items-tax-total" name="items_tax_total" value="0" />
+                      <div class="row">
+                        <div class="col-md-7 col-sm-12 text-xs-center text-md-left">&nbsp; </div>
+                        <div class="col-md-5 col-sm-12">
+                          <div class="table-responsive">
+                            <table class="table">
+                              <tbody>
+                                <tr>
+                                  <td>Sub Total</td>
+                                  <td class="text-xs-right" width="200"><?php echo $sc_show;?> <span class="sub_total">0</span></td>
+                                </tr>
+                                <tr>
+                                  <td colspan="2" style="border-bottom:1px solid #dddddd; padding:0px !important; text-align:left"><table class="table table-bordered">
+                                      <tbody>
+                                        <tr>
+                                          <!--<td width="30%" style="border-bottom:1px solid #dddddd; text-align:left"><strong>Tax Type</strong></td>-->
+                                          <td align="left" style="border-bottom:1px solid #dddddd;"><strong>Tax</strong></td>
+                                          <!--<td style="border-bottom:1px solid #dddddd; text-align:left"><strong>Tax Amount</strong></td>-->
+                                        </tr>
+                                        <tr>
+                                          <!--<td><div class="form-group">
+                                              <select name="tax_type" class="form-control tax_type">
+                                                <option value="1"> Flat</option>
+                                                <option value="2"> Percent</option>
+                                              </select>
+                                            </div></td>-->
+                                          <td align="left" colspan="3"><div class="form-group">
+                                           <input type="hidden" name="tax_type" class="form-control tax_type" value="1" />
+                                           <input type="hidden" name="tax_amount" class="form-control tax_amount" value="0" />
+                                              <input style="text-align:right; width:105px;" type="text" name="tax_figure" class="form-control tax_figure" value="0" data-valid-num="required">
+                                            </div></td>
+                                          <!--<td align="right"><div class="form-group">
+                                              <input type="text" style="text-align:right" readonly="" name="tax_amount" value="0" class="tax_amount form-control">
+                                            </div></td>-->
+                                        </tr>
+                                      </tbody>
+                                    </table></td>
+                                </tr>
+                                <tr>
+                                  <td colspan="2" style="border-bottom:1px solid #dddddd; padding:0px !important; text-align:left"><table class="table table-bordered">
+                                      <tbody>
+                                        <tr>
+                                          <td width="30%" style="border-bottom:1px solid #dddddd; text-align:left"><strong>Discount Type</strong></td>
+                                          <td style="border-bottom:1px solid #dddddd; text-align:center"><strong>Discount</strong></td>
+                                          <td style="border-bottom:1px solid #dddddd; text-align:left"><strong>Discount Amount</strong></td>
+                                        </tr>
+                                        <tr>
+                                          <td><div class="form-group">
+                                              <select name="discount_type" class="form-control discount_type">
+                                                <option value="1"> Flat</option>
+                                                <option value="2"> Percent</option>
+                                              </select>
+                                            </div></td>
+                                          <td align="right"><div class="form-group">
+                                              <input style="text-align:right" type="text" name="discount_figure" class="form-control discount_figure" value="0" data-valid-num="required">
+                                            </div></td>
+                                          <td align="right"><div class="form-group">
+                                              <input type="text" style="text-align:right" readonly="" name="discount_amount" value="0" class="discount_amount form-control">
+                                            </div></td>
+                                        </tr>
+                                      </tbody>
+                                    </table></td>
+                                </tr>
+                              <input type="hidden" class="fgrand_total" name="fgrand_total" value="0" />
+                              <tr>
+                                <td>Grand Total</td>
+                                <td class="text-xs-right"><?php echo $sc_show;?> <span class="grand_total">0</span></td>
+                              </tr>
+                                </tbody>
+                              
+                            </table>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="form-group col-xs-12 mb-2 file-repeaters"> </div>
+                      <div class="row">
+                        <div class="col-lg-12">
+                          <label for="quote_note"><?php echo $this->lang->line('xin_quote_note');?></label>
+                          <textarea name="quote_note" class="form-control"></textarea>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div id="invoice-footer">
+                  <div class="row">
+                    <div class="col-md-7 col-sm-12">
+                      <h6>Terms &amp; Condition</h6>
+                      <p>You know, being a test pilot isn't always the healthiest business in the world. We predict too much for the next year and yet far too little for the next 10.</p>
+                    </div>
+                    <div class="col-md-5 col-sm-12 text-xs-center">
+                      <button type="submit" name="invoice_submit" class="btn btn-primary pull-right my-1" style="margin-right: 5px;"><i class="fa fa fa-check-square-o"></i> Submit Quote</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <?php echo form_close(); ?> </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
